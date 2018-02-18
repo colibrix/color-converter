@@ -220,7 +220,7 @@ class ColorLogic(QtWidgets.QMainWindow, Ui_ColorsConverterWindow):
         b = self.B / RGB_SCALE
 
         max1 = max(r, g, b)
-        self.K = round(1 - max1, ACCURACY)
+        self.K = round(1 - max1, 2)
         if self.K == 1:
             self.C = 0
             self.M = 0
