@@ -24,34 +24,34 @@ class ColorLogic(QtWidgets.QMainWindow, Ui_ColorsConverterWindow):
 
         self.color_frame.setStyleSheet(self.get_change_rectangle_color())
 
-        self.rgb_r_slider.sliderMoved.connect(self.change_red_rgb)
+        self.rgb_r_slider.sliderMoved.connect(self.rgb_turn)
         self.rgb_r_slider.valueChanged.connect(self.set_rgb_red)
 
-        self.rgb_b_slider.sliderMoved.connect(self.change_blue_rgb)
+        self.rgb_b_slider.sliderMoved.connect(self.rgb_turn)
         self.rgb_b_slider.valueChanged.connect(self.set_rgb_blue)
 
-        self.rgb_g_slider.sliderMoved.connect(self.change_green_rgb)
+        self.rgb_g_slider.sliderMoved.connect(self.rgb_turn)
         self.rgb_g_slider.valueChanged.connect(self.set_rgb_green)
 
-        self.cmyk_c_slider.sliderMoved.connect(self.change_cyan_cmyk)
+        self.cmyk_c_slider.sliderMoved.connect(self.cmyk_turn)
         self.cmyk_c_slider.valueChanged.connect(self.set_cmyk_cyan)
 
-        self.cmyk_m_slider.sliderMoved.connect(self.change_magenta_cmyk)
+        self.cmyk_m_slider.sliderMoved.connect(self.cmyk_turn)
         self.cmyk_m_slider.valueChanged.connect(self.set_cmyk_magenta)
 
-        self.cmyk_y_slider.sliderMoved.connect(self.change_yellow_cmyk)
+        self.cmyk_y_slider.sliderMoved.connect(self.cmyk_turn)
         self.cmyk_y_slider.valueChanged.connect(self.set_cmyk_yellow)
 
-        self.cmyk_k_slider.sliderMoved.connect(self.change_key_cmyk)
+        self.cmyk_k_slider.sliderMoved.connect(self.cmyk_turn)
         self.cmyk_k_slider.valueChanged.connect(self.set_cmyk_key)
 
-        self.hsl_h_slider.sliderMoved.connect(self.change_hue_hsl)
+        self.hsl_h_slider.sliderMoved.connect(self.hsl_turn)
         self.hsl_h_slider.valueChanged.connect(self.set_hsl_hue)
 
-        self.hsl_s_slider.sliderMoved.connect(self.change_sat_hsl)
+        self.hsl_s_slider.sliderMoved.connect(self.hsl_turn)
         self.hsl_s_slider.valueChanged.connect(self.set_hsl_sat)
 
-        self.hsl_l_slider.sliderMoved.connect(self.change_light_hsl)
+        self.hsl_l_slider.sliderMoved.connect(self.hsl_turn)
         self.hsl_l_slider.valueChanged.connect(self.set_hsl_light)
 
         self.show()
@@ -165,34 +165,13 @@ class ColorLogic(QtWidgets.QMainWindow, Ui_ColorsConverterWindow):
             self.rgb_to_cmyk()
             self.change_rgb_sliders()
 
-    def change_red_rgb(self):
+    def rgb_turn(self):
         self.order = 0
 
-    def change_green_rgb(self):
-        self.order = 0
-
-    def change_blue_rgb(self):
-        self.order = 0
-
-    def change_cyan_cmyk(self):
+    def cmyk_turn(self):
         self.order = 1
 
-    def change_magenta_cmyk(self):
-        self.order = 1
-
-    def change_yellow_cmyk(self):
-        self.order = 1
-
-    def change_key_cmyk(self):
-        self.order = 1
-
-    def change_hue_hsl(self):
-        self.order = 2
-
-    def change_sat_hsl(self):
-        self.order = 2
-
-    def change_light_hsl(self):
+    def hsl_turn(self):
         self.order = 2
 
     ##########################################################
