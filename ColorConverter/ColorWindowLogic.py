@@ -1,6 +1,7 @@
 import math
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPainter, QColor
+from PyQt5.QtWidgets import QColorDialog
 
 from ColorsWindow import Ui_ColorsConverterWindow
 from Constants import *
@@ -17,6 +18,8 @@ class ColorLogic(QtWidgets.QMainWindow, Ui_ColorsConverterWindow):
         self.C = self.M = self.Y = self.K = 0
 
         self.H = self.S = self.L = 0
+
+        self.Lab_L = self.Lab_A = self.Lab_B = 0
 
         self.color_frame.setStyleSheet(self.get_change_rectangle_color())
 
@@ -50,7 +53,45 @@ class ColorLogic(QtWidgets.QMainWindow, Ui_ColorsConverterWindow):
         self.hsl_l_slider.sliderMoved.connect(self.hsl_turn)
         self.hsl_l_slider.valueChanged.connect(self.set_hsl_light)
 
+        self.lab_l_slider.sliderMoved.connect(self.lab_turn)
+        self.lab_a_slider.sliderMoved.connect(self.lab_turn)
+        self.lab_b_slider.sliderMoved.connect(self.lab_turn)
+        self.lab_l_slider.valueChanged.connect(self.set_lab_l)
+        self.lab_a_slider.valueChanged.connect(self.set_lab_a)
+        self.lab_b_slider.valueChanged.connect(self.set_lab_b)
+
+
+        self.color_picker_button.clicked.connect(self.color_picker_dialog)
+        self.setAllLinesZero()
         self.show()
+
+    def setAllLinesZero(self):
+        self.rgb_red_line.setText("0")
+        self.rgb_green_line.setText("0")
+        self.rgb_blue_line.setText("0")
+
+        self.cmyk_c_line.setText("0")
+        self.cmyk_m_line.setText("0")
+        self.cmyk_y_line.setText("0")
+        self.cmyk_k_line.setText("0")
+
+        self.hsl_hue_line.setText("0")
+        self.hsl_sat_line.setText("0")
+        self.hsl_light_line.setText("0")
+
+        self.lab_l_line.setText("0")
+        self.lab_a_line.setText("0")
+        self.lab_b_line.setText("0")
+
+    def color_picker_dialog(self):
+        self.order = 0
+        color = QColorDialog.getColor()
+        rgb = color.getRgb()
+        self.R = rgb[0]
+        self.G = rgb[1]
+        self.B = rgb[2]
+        self.change_rgb_sliders()
+
 
     def change_cmyk_sliders(self):
         self.cmyk_c_slider.setValue(self.C * CMYK_SCALE)
@@ -68,59 +109,91 @@ class ColorLogic(QtWidgets.QMainWindow, Ui_ColorsConverterWindow):
         self.rgb_g_slider.setValue(self.G)
         self.rgb_b_slider.setValue(self.B)
 
+    def change_lab_Sliders(self):
+        self.lab_l_slider.setValue(self.Lab_L)
+        self.lab_a_slider.setValue(self.Lab_A)
+        self.lab_b_slider.setValue(self.Lab_B)
+
     def rgb_changes(self):
         self.rgb_to_cmyk()
         self.rgb_to_hsl()
+        self.rgb2lab()
         self.change_cmyk_sliders()
         self.change_hsl_sliders()
+        self.change_lab_Sliders()
 
     def set_rgb_red(self):
-
         if self.order == 0:
             self.R = self.rgb_r_slider.value()
             self.rgb_changes()
 
         elif self.order == 1:
             self.change_hsl_sliders()
+            self.change_lab_Sliders()
 
         elif self.order == 2:
             self.change_cmyk_sliders()
+            self.change_lab_Sliders()
+
+        elif self.order == 3:
+            self.change_cmyk_sliders()
+            self.change_hsl_sliders()
+
         self.rgb_red_line.setText(str(self.R))
         self.change_rectangle_color()
 
     def set_rgb_green(self):
-
         if self.order == 0:
             self.G = self.rgb_g_slider.value()
             self.rgb_changes()
         elif self.order == 1:
             self.change_hsl_sliders()
+            self.change_lab_Sliders()
         elif self.order == 2:
             self.change_cmyk_sliders()
+            self.change_lab_Sliders()
+        elif self.order == 3:
+            self.change_cmyk_sliders()
+            self.change_hsl_sliders()
+
         self.rgb_green_line.setText(str(self.G))
         self.change_rectangle_color()
 
     def set_rgb_blue(self):
-
         if self.order == 0:
             self.B = self.rgb_b_slider.value()
             self.change_rectangle_color()
             self.rgb_changes()
 
+
         elif self.order == 1:
+
             self.change_hsl_sliders()
 
+            self.change_lab_Sliders()
+
         elif self.order == 2:
+
             self.change_cmyk_sliders()
+
+            self.change_lab_Sliders()
+
+        elif self.order == 3:
+
+            self.change_cmyk_sliders()
+
+            self.change_hsl_sliders()
+
         self.rgb_blue_line.setText(str(self.B))
         self.change_rectangle_color()
 
     def set_cmyk_cyan(self):
-
         if self.order == 1:
             self.C = self.cmyk_c_slider.value() / CMYK_SCALE
             self.cmyk_to_rgb()
             self.rgb_to_hsl()
+            self.rgb2lab()
+
             self.change_rgb_sliders()
         self.cmyk_c_line.setText(str(self.C))
 
@@ -130,6 +203,7 @@ class ColorLogic(QtWidgets.QMainWindow, Ui_ColorsConverterWindow):
             self.M = self.cmyk_m_slider.value() / CMYK_SCALE
             self.cmyk_to_rgb()
             self.rgb_to_hsl()
+            self.rgb2lab()
             self.change_rgb_sliders()
         self.cmyk_m_line.setText(str(self.M))
 
@@ -139,6 +213,7 @@ class ColorLogic(QtWidgets.QMainWindow, Ui_ColorsConverterWindow):
             self.Y = self.cmyk_y_slider.value() / CMYK_SCALE
             self.cmyk_to_rgb()
             self.rgb_to_hsl()
+            self.rgb2lab()
             self.change_rgb_sliders()
         self.cmyk_y_line.setText(str(self.Y))
 
@@ -148,6 +223,7 @@ class ColorLogic(QtWidgets.QMainWindow, Ui_ColorsConverterWindow):
             self.K = self.cmyk_k_slider.value() / CMYK_SCALE
             self.cmyk_to_rgb()
             self.rgb_to_hsl()
+            self.rgb2lab()
             self.change_rgb_sliders()
         self.cmyk_k_line.setText(str(self.K))
 
@@ -157,6 +233,7 @@ class ColorLogic(QtWidgets.QMainWindow, Ui_ColorsConverterWindow):
             self.H = self.hsl_h_slider.value()
             self.hsl_to_rgb()
             self.rgb_to_cmyk()
+            self.rgb2lab()
             self.change_rgb_sliders()
         self.hsl_hue_line.setText(str(self.H))
 
@@ -167,6 +244,7 @@ class ColorLogic(QtWidgets.QMainWindow, Ui_ColorsConverterWindow):
             self.S = self.hsl_s_slider.value() / HSL_SCALE
             self.hsl_to_rgb()
             self.rgb_to_cmyk()
+            self.rgb2lab()
             self.change_rgb_sliders()
         self.hsl_sat_line.setText(str(self.S))
 
@@ -176,8 +254,36 @@ class ColorLogic(QtWidgets.QMainWindow, Ui_ColorsConverterWindow):
             self.L = self.hsl_l_slider.value() / HSL_SCALE
             self.hsl_to_rgb()
             self.rgb_to_cmyk()
+            self.rgb2lab()
             self.change_rgb_sliders()
         self.hsl_light_line.setText(str(self.L))
+
+    def set_lab_l(self):
+        if self.order == 3:
+            self.Lab_L = self.lab_l_slider.value()
+            self.lab2rgb()
+            self.rgb_to_cmyk()
+            self.rgb_to_hsl()
+            self.change_rgb_sliders()
+        self.lab_l_line.setText(str(self.Lab_L))
+
+    def set_lab_a(self):
+        if self.order == 3:
+            self.Lab_A = self.lab_l_slider.value()
+            self.lab2rgb()
+            self.rgb_to_cmyk()
+            self.rgb_to_hsl()
+            self.change_rgb_sliders()
+        self.lab_a_line.setText(str(self.Lab_A))
+
+    def set_lab_b(self):
+        if self.order == 3:
+            self.Lab_B = self.lab_l_slider.value()
+            self.lab2rgb()
+            self.rgb_to_cmyk()
+            self.rgb_to_hsl()
+            self.change_rgb_sliders()
+        self.lab_b_line.setText(str(self.Lab_B))
 
     def rgb_turn(self):
         self.order = 0
@@ -187,6 +293,9 @@ class ColorLogic(QtWidgets.QMainWindow, Ui_ColorsConverterWindow):
 
     def hsl_turn(self):
         self.order = 2
+
+    def lab_turn(self):
+        self.order = 3
 
     ##########################################################
     ##########################################################
@@ -314,3 +423,112 @@ class ColorLogic(QtWidgets.QMainWindow, Ui_ColorsConverterWindow):
             b = x
 
         return r, g, b
+
+    XYZ_DELTA = 6.0 / 29.0
+
+    def func_rgbToXyz(self, x):
+        if x > 0.04045:
+            return pow((x + 0.055) / 1.055, 2.4)
+        return x / 12.92
+
+    def rgb_to_xyz(self, r, g, b):
+        rn = self.func_rgbToXyz(r / 255) * 100
+        gn = self.func_rgbToXyz(g / 255) * 100
+        bn = self.func_rgbToXyz(b / 255) * 100
+
+        x = 0.412453 * rn + 0.357580 * gn + 0.180423 * bn
+        y = 0.212671 * rn + 0.715160 * gn + 0.072169 * bn
+        z = 0.019334 * rn + 0.119193 * gn + 0.950227 * bn
+
+        return x, y, z
+
+    def f_xyz_to_rgb(self, x):
+        if x > 0.0031308:
+            return 1.055 * pow(x, 1/2.4) - 0.055
+        return 12.92 * x
+
+    def xyz_to_rgb(self, x, y, z):
+        x1 = x / 100
+        y1 = y / 100
+        z1 = z / 100
+        rn = 3.2406 * x1 + -1.5372 * y1 + -0.4986 * z1
+        gn = -0.9689 * x1 + 1.8758 * y1 + 0.0415 * z1
+        bn = 0.0557 * x1 + -0.2040 * y1 + 1.0570 * z1
+
+        r = int(round(self.f_xyz_to_rgb(rn) * 255, 0))
+        g = int(round(self.f_xyz_to_rgb(gn) * 255, 0))
+        b = int(round(self.f_xyz_to_rgb(bn) * 255, 0))
+
+        return r, g, b
+
+    def func_xyz_to_lab(self, x):
+        if x >= 0.008856:
+            return math.pow(x, 1/3.)
+
+        return 7.787 * x + 16/116.
+
+    def xyz_to_lab(self, x, y, z):
+        l = 116. * self.func_xyz_to_lab(y / Y_WHITE) - 16.
+        a = 500. * (self.func_xyz_to_lab(x / X_WHITE) - self.func_xyz_to_lab(y / Y_WHITE))
+        b = 200. * (self.func_xyz_to_lab(y / Y_WHITE) - self.func_xyz_to_lab(z / Z_WHITE))
+        l = int(l)
+        a = int(a)
+        b = int(b)
+        return l, a, b
+
+    def f_lab_to_xyz(self, x):
+        if x  >= 0.008856:
+            return math.pow(x, 3)
+        return (x - 16/116.) / 7.787
+
+    def lab_to_xyz(self, l, a, b):
+        y = self.f_lab_to_xyz((l + 16) / 116.) * X_WHITE
+        x = self.f_lab_to_xyz(a / 500. + (l + 16)/116.) * Y_WHITE
+        z = self.f_lab_to_xyz((l + 16) / 116. - b /200.) * Z_WHITE
+
+        return x,y,z
+
+    def rgb2lab(self):
+        x, y, z = self.rgb_to_xyz(self.R, self.G, self.B)
+        l, a, b = self.xyz_to_lab(x, y, z)
+        if l < 0:
+            self.Lab_L = 0
+        elif l > 100:
+            self.Lab_L = 100
+        else:
+            self.Lab_L = l
+
+        if a < -128:
+            self.Lab_A = -128
+        elif a > 128:
+            self.Lab_A = 128
+        else:
+            self.Lab_A = a
+
+        if b < -128:
+            self.Lab_B = -128
+        elif b > 128:
+            self.Lab_B = 128
+        else:
+            self.Lab_B = b
+
+
+    def lab2rgb(self):
+        x, y, z = self.lab_to_xyz(self.Lab_L, self.Lab_A, self.Lab_B)
+        r, g, b = self.xyz_to_rgb(x, y, z)
+        if r > 255:
+            r = 255
+        elif r < 0:
+            r = 0
+        if g > 255:
+            g = 255
+        elif g < 0:
+            g = 0
+
+        if b > 255:
+            b = 255
+        elif b < 0:
+            b = 0
+        self.R = r
+        self.G = g
+        self.B = b
