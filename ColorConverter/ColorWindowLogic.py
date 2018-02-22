@@ -269,7 +269,7 @@ class ColorLogic(QtWidgets.QMainWindow, Ui_ColorsConverterWindow):
 
     def set_lab_a(self):
         if self.order == 3:
-            self.Lab_A = self.lab_l_slider.value()
+            self.Lab_A = self.lab_a_slider.value()
             self.lab2rgb()
             self.rgb_to_cmyk()
             self.rgb_to_hsl()
@@ -278,7 +278,7 @@ class ColorLogic(QtWidgets.QMainWindow, Ui_ColorsConverterWindow):
 
     def set_lab_b(self):
         if self.order == 3:
-            self.Lab_B = self.lab_l_slider.value()
+            self.Lab_B = self.lab_b_slider.value()
             self.lab2rgb()
             self.rgb_to_cmyk()
             self.rgb_to_hsl()
